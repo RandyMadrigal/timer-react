@@ -1,9 +1,9 @@
 import { FaRepeat } from "react-icons/fa6";
 
-export const Repeat = () => {
+export const Reset = () => {
   return (
     <>
-      <FaRepeat />
+      <FaRepeat id="reset" />
     </>
   );
 };
