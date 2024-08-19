@@ -9,11 +9,11 @@ export const PadSession = ({
   handleClickDown,
 }) => {
   return (
-    <div className="flex flex-col gap-2 my-6 text-center text-2xl">
+    <div className="flex flex-col gap-2 text-center text-2xl">
       <div>
         <h3 id="session-label">{title}</h3>
       </div>
-      <div className="flex justify-center gap-2">
+      <div className="flex justify-center gap-4">
         <button id="session-increment" onClick={handleClickUp}>
           <PiArrowFatUpFill />
         </button>

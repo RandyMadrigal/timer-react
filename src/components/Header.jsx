@@ -1,7 +1,7 @@
 export const Header = () => {
   return (
     <>
-      <h1 className="text-5xl md:text-4xl text-center">25 + 5 Clock</h1>
+      <h1 className="text-4xl md:text-5xl text-center mb-5">25 + 5 Clock</h1>
     </>
   );
 };

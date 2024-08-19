@@ -3,13 +3,15 @@ import { Timer } from "./Timer";
 import { Play } from "./Play";
 import { Pause } from "./Pause";
 import { Reset } from "./Reset";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PadBreak } from "./PadBreak";
 import { PadSession } from "./PadSession";
 
 export const TimerContainer = () => {
   const [breakLength, setBreakLength] = useState(5);
   const [sessionLength, setSessionLength] = useState(25);
+
+  useEffect(() => {}, []);
 
   const handleClickUp = (e) => {
     const btnId = e.currentTarget.id;
@@ -36,9 +38,9 @@ export const TimerContainer = () => {
 
   return (
     //TODO responsive
-    <div className="flex flex-col justify-center items-center w-10/12 ">
+    <div className="flex flex-col justify-center items-center w-9/12 text-center ">
       <Header />
-      <div className="flex flex-col md:flex-row gap-20">
+      <div className="flex flex-col md:flex-row md:gap-20">
         <PadBreak
           title="Break Length"
           counter={breakLength}

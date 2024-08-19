@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 
 export const Timer = ({ title, value }) => {
   return (
-    <div className="border-4 rounded-3xl border-emerald-950 w-3/12 py-5 text-center ">
+    <div className="border-4 rounded-3xl border-emerald-950 w-8/12 max-w-56 p-4 my-4 text-center">
       <h3 id="timer-label" className="text-2xl">
         {title}
       </h3>
