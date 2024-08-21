@@ -6,19 +6,38 @@ import { Reset } from "./Reset";
 import { useEffect, useState } from "react";
 import { PadBreak } from "./PadBreak";
 import { PadSession } from "./PadSession";
+import {Minutes} from "../hooks/Minutes"
+import {Seconds} from "../hooks/Seconds"
+import {PlayHook} from "../hooks/PlayHook"
+
+
 
 export const TimerContainer = () => {
   const [breakLength, setBreakLength] = useState(5);
-  const [sessionLength, setSessionLength] = useState(25);
+  const [sessionLength, setSessionLength] = useState(5);
+  const {minutes, minutesDecrement, update} = Minutes(sessionLength);
+  const {seconds, secondsDecrement, reset} = Seconds(0);
+  const {isPlay,playing} = PlayHook()
 
-  useEffect(() => {}, []);
+  const handlePlay = (e) => {
+    const btnId = e.currentTarget.id;
+
+    if(btnId === "start_stop" ){
+      console.log(btnId)
+      playing()
+    }
+
+  };
 
   const handleClickUp = (e) => {
     const btnId = e.currentTarget.id;
 
-    btnId === "break-increment"
-      ? setBreakLength(breakLength + 1)
-      : setSessionLength(sessionLength + 1);
+    if(btnId === "break-increment"){
+      setBreakLength(breakLength + 1)
+    }else{
+      setSessionLength(sessionLength + 1);
+    }
+
   };
 
   const handleClickDown = (e) => {
@@ -35,6 +54,27 @@ export const TimerContainer = () => {
         break;
     }
   };
+
+  useEffect(() => {
+
+    if(isPlay){
+
+      if(seconds < 0){
+        reset()  
+        minutesDecrement()  
+       }
+  
+      const myInterval = setInterval(() => {
+        secondsDecrement()
+      }, 1000);
+
+      return () =>{
+        clearInterval(myInterval)
+      }
+
+    }
+  }, [seconds,isPlay]);
+
 
   return (
     //TODO responsive
@@ -54,10 +94,10 @@ export const TimerContainer = () => {
           handleClickDown={handleClickDown}
         />
       </div>
-      <Timer title="Session" value={sessionLength} />
+      <Timer title="Session" minutes={minutes} seconds={seconds} />
       <div className="flex flex-row gap-3 my-5 text-2xl">
         <Pause />
-        <Play />
+        <Play handlePlay={handlePlay} />
         <Reset />
       </div>
     </div>

@@ -1,9 +1,14 @@
 import { FaPlay } from "react-icons/fa";
 
-export const Play = () => {
+export const Play = ({handlePlay}) => {
+
+
+
   return (
     <>
-      <FaPlay id="start_stop" />
+    <button onClick={handlePlay} id="start_stop">
+      <FaPlay/>
+    </button>
     </>
   );
 };
