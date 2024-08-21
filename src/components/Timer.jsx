@@ -7,7 +7,8 @@ export const Timer = ({ title, minutes, seconds }) => {
         {title}
       </h3>
       <h2 id="time-left" className="text-6xl mt-4">
-        {minutes}:{seconds < 10 ? "0"+seconds : seconds}
+        {minutes < 10 ? "0" + minutes : minutes}:
+        {seconds < 10 ? "0" + seconds : seconds}
       </h2>
     </div>
   );

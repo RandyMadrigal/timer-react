@@ -2,23 +2,18 @@ import PropTypes from "prop-types";
 import { PiArrowFatDownFill } from "react-icons/pi";
 import { PiArrowFatUpFill } from "react-icons/pi";
 
-export const PadBreak = ({
-  title,
-  counter,
-  handleClickUp,
-  handleClickDown,
-}) => {
+export const PadBreak = ({ title, counter, handleClickBreak }) => {
   return (
     <div className="flex flex-col gap-2 mb-4 text-center text-2xl">
       <div>
         <h3 id="break-label">{title}</h3>
       </div>
       <div className="flex justify-center gap-4">
-        <button id="break-increment" onClick={handleClickUp}>
+        <button id="break-increment" onClick={handleClickBreak}>
           <PiArrowFatUpFill />
         </button>
         <h3 id="break-length">{counter}</h3>
-        <button id="break-decrement" onClick={handleClickDown}>
+        <button id="break-decrement" onClick={handleClickBreak}>
           <PiArrowFatDownFill />
         </button>
       </div>
@@ -29,6 +24,5 @@ export const PadBreak = ({
 PadBreak.propTypes = {
   title: PropTypes.string.isRequired,
   counter: PropTypes.number.isRequired,
-  handleClickUp: PropTypes.func,
-  handleClickDown: PropTypes.func,
+  handleClickBreak: PropTypes.func,
 };
