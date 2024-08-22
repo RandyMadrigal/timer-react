@@ -11,6 +11,9 @@ import { MinutesHook } from "../hooks/MinutesHook";
 import { SecondsHook } from "../hooks/SecondsHook";
 import { PlayHook } from "../hooks/PlayHook";
 import {ResetHook} from "../hooks//ResetHook"
+import {AudioHook} from "../hooks/AudioHook"
+
+/*Audio Element*/
 
 export const TimerContainer = () => {
   const [breakLength, setBreakLength] = useState(5);
@@ -18,7 +21,8 @@ export const TimerContainer = () => {
   const { minutes, minuteDecrease,update} = MinutesHook(sessionLength);
   const { seconds, secondDecrease, reset, secondInit } = SecondsHook(0);
   const { isPlay, playing } = PlayHook(false);
-  const {isReset, restart} = ResetHook(false)
+  const {isReset, restart} = ResetHook(false);
+  const {playBeep} = AudioHook("https://cdn.freecodecamp.org/testable-projects-fcc/audio/BeepSound.wav")
 
   //TODO refactor...
   const handleReset = (e) =>{
@@ -106,7 +110,10 @@ export const TimerContainer = () => {
         reset();
       }
 
-      minutes === 0 && seconds === 0 && playing(false)
+      if(minutes === 0 && seconds === 0){
+        playing(false)
+        playBeep()
+      }
 
       const myInterval = setInterval(() => {
         secondDecrease();
