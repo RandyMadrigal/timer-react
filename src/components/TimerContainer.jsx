@@ -6,39 +6,78 @@ import { Reset } from "./Reset";
 import { useEffect, useState } from "react";
 import { PadBreak } from "./PadBreak";
 import { PadSession } from "./PadSession";
+/*hook*/
 import { MinutesHook } from "../hooks/MinutesHook";
 import { SecondsHook } from "../hooks/SecondsHook";
 import { PlayHook } from "../hooks/PlayHook";
+import {ResetHook} from "../hooks//ResetHook"
 
 export const TimerContainer = () => {
   const [breakLength, setBreakLength] = useState(5);
-  const [sessionLength, setSessionLength] = useState(5);
-  const { minutes, minutesDecrement, update } = MinutesHook(sessionLength);
-  const { seconds, secondsDecrement, reset } = SecondsHook(0);
-  const { isPlay, playing } = PlayHook();
+  const [sessionLength, setSessionLength] = useState(25);
+  const { minutes, minuteDecrease,update} = MinutesHook(sessionLength);
+  const { seconds, secondDecrease, reset, secondInit } = SecondsHook(0);
+  const { isPlay, playing } = PlayHook(false);
+  const {isReset, restart} = ResetHook(false)
 
+  //TODO refactor...
+  const handleReset = (e) =>{
+    const btnId = e.currentTarget.id;
+
+    if (btnId === "reset") {
+      restart(true)
+    }
+  }
+//TODO refactor...
   const handlePlay = (e) => {
     const btnId = e.currentTarget.id;
+    restart(false)
 
     if (btnId === "start_stop") {
-      console.log(btnId);
-      playing();
+      if(isPlay){
+        playing(false);
+      }else{
+        playing(true);
+      }
     }
   };
+//TODO refactor...
+  const handlePause = (e) => {
+    const btnId = e.currentTarget.id;
+    restart(false)
 
+    if (btnId === "pause") {
+      playing(false);
+    }
+  };
+  //TODO refactor...
   const handleClickSession = (e) => {
     const btnId = e.currentTarget.id;
+    restart(false)
 
     if (btnId === "session-increment") {
       sessionLength < 60 && setSessionLength(sessionLength + 1);
+      update(sessionLength + 1)
+
     }
     if (btnId === "session-decrement") {
-      sessionLength > 1 && setSessionLength(sessionLength - 1);
+      
+      if(sessionLength > 1){
+        setSessionLength(sessionLength - 1);
+        update(sessionLength - 1)
+      }   
+
+      
+
+ 
+      
+
     }
   };
-
+//TODO refactor...
   const handleClickBreak = (e) => {
     const btnId = e.currentTarget.id;
+    restart(false)
 
     if (btnId === "break-decrement") {
       breakLength > 1 && setBreakLength(breakLength - 1);
@@ -48,26 +87,37 @@ export const TimerContainer = () => {
       breakLength < 60 && setBreakLength(breakLength + 1);
     }
   };
-
+//TODO refactor...
   useEffect(() => {
-    let count = sessionLength;
-    update(count);
+
+    if(isReset){
+      playing(false);
+      setBreakLength(5);
+      setSessionLength(25);
+      update(sessionLength);
+      secondInit(0);
+     
+    }
 
     if (isPlay) {
+
       if (seconds < 0) {
-        minutesDecrement();
+        minuteDecrease();
         reset();
       }
 
+      minutes === 0 && seconds === 0 && playing(false)
+
       const myInterval = setInterval(() => {
-        secondsDecrement();
+        secondDecrease();
       }, 1000);
 
       return () => {
         clearInterval(myInterval);
       };
     }
-  }, [seconds, isPlay, minutesDecrement, reset, secondsDecrement]);
+
+  }, [seconds, isPlay, minuteDecrease, reset, secondDecrease]);
 
   return (
     //TODO responsive
@@ -87,9 +137,9 @@ export const TimerContainer = () => {
       </div>
       <Timer title="Session" minutes={minutes} seconds={seconds} />
       <div className="flex flex-row gap-3 my-5 text-2xl">
-        <Pause />
+        <Pause handlePause={handlePause} />
         <Play handlePlay={handlePlay} />
-        <Reset />
+        <Reset handleReset={handleReset}/>
       </div>
     </div>
   );
