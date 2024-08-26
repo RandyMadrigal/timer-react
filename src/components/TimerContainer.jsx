@@ -6,6 +6,7 @@ import { Reset } from "./Reset";
 import { useEffect, useState } from "react";
 import { PadBreak } from "./PadBreak";
 import { PadSession } from "./PadSession";
+
 /*hooks*/
 import { MinutesHook } from "../hooks/session/MinutesHook";
 import { SecondsHook } from "../hooks/session/SecondsHook";
@@ -15,17 +16,18 @@ import { MinutesBreakHook } from "../hooks/break/MinutesBreakHook";
 import { SecondsBreakHook } from "../hooks/break/SecondsBreakHook";
 
 export const TimerContainer = () => {
+  //states
   const { isPlay, playing } = PlayHook(false);
   const { isReset, restart } = ResetHook(false);
   const [disabled, setDisabled] = useState(false);
+  const [title, setTitle] = useState("Session");
 
-  //#region Session
+  // Session
   const [sessionLength, setSessionLength] = useState(25);
   const { minutes, minuteDecrease, update } = MinutesHook(sessionLength);
   const { seconds, secondDecrease, reset, secondInit } = SecondsHook(0);
-  ////#endregion
 
-  //#region
+  // Break
   const [breakLength, setBreakLength] = useState(5);
   const [isBreak, setIsBreak] = useState(false);
   const { minutesBreak, minuteDecreaseBreak, updateBreak } =
@@ -33,44 +35,25 @@ export const TimerContainer = () => {
   const { secondsBreak, secondDecreaseBreak, resetBreak, secondInitBreak } =
     SecondsBreakHook(0);
 
-  ////#endregion
-
-  //TODO refactor...
-  const handleReset = (e) => {
-    const btnId = e.currentTarget.id;
-
-    if (btnId === "reset") {
-      restart(true);
-      setDisabled(false);
-      setIsBreak(false);
-    }
+  const handleReset = () => {
+    playing(false); // Stop the timer
+    restart(true);
+    setSessionLength(25);
+    setBreakLength(5);
+    update(25); // Reset session minutes
+    updateBreak(5); // Reset break minutes
+    secondInit(0); // Reset session seconds
+    secondInitBreak(0); // Reset break seconds
+    setIsBreak(false);
+    setTitle("Session");
+    setDisabled(false);
   };
-  //TODO refactor...
-  const handlePlay = (e) => {
-    const btnId = e.currentTarget.id;
-    restart(false);
 
-    if (btnId === "start_stop") {
-      if (isPlay) {
-        playing(false);
-        setDisabled(false);
-      } else {
-        playing(true);
-        setDisabled(true);
-      }
-    }
+  const handlePlay = () => {
+    playing(!isPlay);
+    setDisabled(!isPlay);
   };
-  //TODO refactor...
-  const handlePause = (e) => {
-    const btnId = e.currentTarget.id;
-    restart(false);
 
-    if (btnId === "pause") {
-      playing(false);
-      setDisabled(false);
-    }
-  };
-  //TODO refactor...
   const handleClickSession = (e) => {
     const btnId = e.currentTarget.id;
     restart(false);
@@ -86,7 +69,7 @@ export const TimerContainer = () => {
       }
     }
   };
-  //TODO refactor...
+
   const handleClickBreak = (e) => {
     const btnId = e.currentTarget.id;
     restart(false);
@@ -104,77 +87,63 @@ export const TimerContainer = () => {
     }
   };
 
-  //TODO refactor...
+  // Handle reset
+  useEffect(() => {
+    if (isReset) {
+      handleReset();
+    }
+  }, [isReset]);
 
+  // Handle session end
   useEffect(() => {
     if (minutes <= 0 && seconds <= 0) {
       setIsBreak(true);
+      setTitle("Break time!");
     }
+  }, [minutes, seconds]);
 
-    if (isReset) {
-      playing(false);
-      setBreakLength(5);
-      setSessionLength(25);
-      update(25);
-      updateBreak(5);
-      secondInit(0);
-      secondInitBreak(0);
+  // Handle break end and session transition
+  useEffect(() => {
+    if (isBreak) {
+      if (secondsBreak <= 0) {
+        resetBreak(59);
+        minuteDecreaseBreak();
+      }
+      if (minutesBreak <= 0 && secondsBreak <= 0) {
+        update(sessionLength - 1); // Reset session length
+        setTitle("Session");
+        setIsBreak(false);
+      }
     }
+  }, [isBreak]);
 
+  // Handle play/pause
+  useEffect(() => {
     if (isPlay) {
-      if (seconds < 0 && isBreak === false) {
-        reset(59);
-        minuteDecrease();
-      }
-
-      if (isBreak) {
-        if (secondsBreak < 0) {
-          resetBreak(59);
-          minuteDecreaseBreak();
-        }
-
-        if (minutesBreak <= 0 && secondsBreak <= 0) {
-          setIsBreak(false);
-          update(sessionLength - 1);
-        }
-      }
-
       const myInterval = setInterval(() => {
-        console.log(minutes + ":" + seconds);
-        isBreak ? secondDecreaseBreak() : secondDecrease();
+        if (isBreak) {
+          if (secondsBreak < 0) {
+            resetBreak(59);
+            minuteDecreaseBreak();
+          } else {
+            secondDecreaseBreak();
+          }
+        } else {
+          if (seconds <= 0) {
+            reset(59);
+            minuteDecrease();
+          } else {
+            secondDecrease();
+          }
+        }
       }, 1000);
 
-      return () => {
-        clearInterval(myInterval);
-      };
+      return () => clearInterval(myInterval);
     }
-  }, [
-    seconds,
-    isPlay,
-    minuteDecrease,
-    reset,
-    secondDecrease,
-    isReset,
-    playing,
-    update,
-    sessionLength,
-    secondInit,
-    minutes,
-    setIsBreak,
-    isBreak,
-    updateBreak,
-    breakLength,
-    secondInitBreak,
-    minuteDecreaseBreak,
-    resetBreak,
-    minutesBreak,
-    secondsBreak,
-    secondDecreaseBreak,
-  ]);
+  }, [isPlay, seconds, isBreak, secondsBreak]);
 
   return (
-    //TODO responsive
-    <div className="flex flex-col justify-center items-center w-9/12 text-center ">
+    <div className="flex flex-col justify-center items-center w-9/12 text-center">
       <Header />
       <div className="flex flex-col md:flex-row md:gap-20">
         <PadBreak
@@ -191,12 +160,12 @@ export const TimerContainer = () => {
         />
       </div>
       <Timer
-        title={isBreak ? "Break" : "Session"}
+        title={title}
         minutes={isBreak ? minutesBreak : minutes}
         seconds={isBreak ? secondsBreak : seconds}
       />
       <div className="flex flex-row gap-3 my-5 text-2xl">
-        <Pause handlePause={handlePause} />
+        <Pause handlePause={handlePlay} />
         <Play handlePlay={handlePlay} />
         <Reset handleReset={handleReset} />
       </div>
