@@ -52,6 +52,7 @@ export const TimerContainer = () => {
     setDisabled(false);
   };
 
+  
   const handlePlay = () => {
     playing(!isPlay);
     setDisabled(!isPlay);
@@ -97,50 +98,51 @@ export const TimerContainer = () => {
     }
   }, [isReset]);
 
-  // Handle session end
-  useEffect(() => {
-    if (minutes === 0 && seconds === 0) {
-      setIsBreak(true);
-      setTitle("Break time!");
-      updateBreak(breakLength);
-    }
-  }, [minutes, seconds]);
-
-  // Handle break end and session transition
-  useEffect(() => {
-    if (isBreak) {
-      if (minutesBreak === 0 && secondsBreak === 0) {
-        setTitle("Session");
-        setIsBreak(false);
-        update(sessionLength);
-      }
-    }
-  }, [isBreak, minutesBreak, secondsBreak]);
 
   // Handle play/pause
   useEffect(() => {
     if (isPlay) {
       const myInterval = setInterval(() => {
+        
         if (isBreak) {
-          if (minutesBreak >= 0 || secondsBreak >= 0) {
-            if (secondsBreak <= 0) {
+          if (minutesBreak === 0 && secondsBreak === 0) {
+            setTitle("Session");
+            setIsBreak(false);
+            update(sessionLength);
+            clearInterval(myInterval)
+            console.log(`break end ${minutesBreak} : ${secondsBreak}`)
+          }
+
+          if (minutesBreak === 0 || secondsBreak >= 0) {
+            if (secondsBreak === 0) {
               resetBreak(59);
-              minuteDecreaseBreak();
+              minutesBreak >= 0 && minuteDecreaseBreak();
             } else {
               secondDecreaseBreak();
             }
           }
         }
 
-        if (minutes >= 0 || seconds >= 0) {
-          if (seconds <= 0) {
-            reset(59);
-            minuteDecrease();
-          } else {
-            secondDecrease();
+        if(!isBreak){
+          if (minutes === 0 && seconds === 0) {
+            setIsBreak(true);
+            setTitle("Break time!");
+            updateBreak(breakLength);
+            clearInterval(myInterval)
+            console.log(`session end ${minutes} : ${seconds}`)
+          }
+
+          if (minutes === 0 || seconds >= 0) {
+            if (seconds === 0) {
+              reset(59);
+            minutes >= 0 && minuteDecrease();
+            } else {
+              secondDecrease();
+            }
           }
         }
-      }, 1000);
+
+      }, 150);
 
       return () => clearInterval(myInterval);
     }
