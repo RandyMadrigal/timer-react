@@ -1,9 +1,17 @@
+import PropTypes from "prop-types";
 import { FaPause } from "react-icons/fa";
 
-export const Pause = () => {
+export const Pause = ({handlePause}) => {
   return (
     <>
-      <FaPause />
+      <button onClick={handlePause} id="pause">
+        <FaPause />
+      </button>
     </>
   );
 };
+
+Pause.propTypes = {
+  handlePause: PropTypes.func.isRequired,
+};
+

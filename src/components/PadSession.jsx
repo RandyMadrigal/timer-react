@@ -5,8 +5,8 @@ import { PiArrowFatUpFill } from "react-icons/pi";
 export const PadSession = ({
   title,
   counter,
-  handleClickUp,
-  handleClickDown,
+  handleClickSession,
+  disabled,
 }) => {
   return (
     <div className="flex flex-col gap-2 text-center text-2xl">
@@ -14,11 +14,19 @@ export const PadSession = ({
         <h3 id="session-label">{title}</h3>
       </div>
       <div className="flex justify-center gap-4">
-        <button id="session-increment" onClick={handleClickUp}>
+        <button
+          id="session-increment"
+          onClick={handleClickSession}
+          disabled={disabled}
+        >
           <PiArrowFatUpFill />
         </button>
         <h3 id="session-length">{counter}</h3>
-        <button id="session-decrement" onClick={handleClickDown}>
+        <button
+          id="session-decrement"
+          onClick={handleClickSession}
+          disabled={disabled}
+        >
           <PiArrowFatDownFill />
         </button>
       </div>
@@ -29,6 +37,6 @@ export const PadSession = ({
 PadSession.propTypes = {
   title: PropTypes.string.isRequired,
   counter: PropTypes.number.isRequired,
-  handleClickUp: PropTypes.func,
-  handleClickDown: PropTypes.func,
+  handleClickSession: PropTypes.func,
+  disabled: PropTypes.bool,
 };
