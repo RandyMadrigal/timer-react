@@ -15,6 +15,9 @@ import { ResetHook } from "../hooks/ResetHook";
 import { MinutesBreakHook } from "../hooks/break/MinutesBreakHook";
 import { SecondsBreakHook } from "../hooks/break/SecondsBreakHook";
 
+/*Helper*/
+import { FormatTime } from "../helpers/FormatTime";
+
 export const TimerContainer = () => {
   //states
   const { isPlay, playing } = PlayHook(false);
@@ -96,39 +99,40 @@ export const TimerContainer = () => {
 
   // Handle session end
   useEffect(() => {
-    if (minutes <= 0 && seconds <= 0) {
+    if (minutes === 0 && seconds === 0) {
       setIsBreak(true);
       setTitle("Break time!");
+      updateBreak(breakLength);
     }
   }, [minutes, seconds]);
 
   // Handle break end and session transition
   useEffect(() => {
     if (isBreak) {
-      if (secondsBreak <= 0) {
-        resetBreak(59);
-        minuteDecreaseBreak();
-      }
-      if (minutesBreak <= 0 && secondsBreak <= 0) {
-        update(sessionLength - 1); // Reset session length
+      if (minutesBreak === 0 && secondsBreak === 0) {
         setTitle("Session");
         setIsBreak(false);
+        update(sessionLength);
       }
     }
-  }, [isBreak]);
+  }, [isBreak, minutesBreak, secondsBreak]);
 
   // Handle play/pause
   useEffect(() => {
     if (isPlay) {
       const myInterval = setInterval(() => {
         if (isBreak) {
-          if (secondsBreak < 0) {
-            resetBreak(59);
-            minuteDecreaseBreak();
-          } else {
-            secondDecreaseBreak();
+          if (minutesBreak >= 0 || secondsBreak >= 0) {
+            if (secondsBreak <= 0) {
+              resetBreak(59);
+              minuteDecreaseBreak();
+            } else {
+              secondDecreaseBreak();
+            }
           }
-        } else {
+        }
+
+        if (minutes >= 0 || seconds >= 0) {
           if (seconds <= 0) {
             reset(59);
             minuteDecrease();
@@ -161,8 +165,8 @@ export const TimerContainer = () => {
       </div>
       <Timer
         title={title}
-        minutes={isBreak ? minutesBreak : minutes}
-        seconds={isBreak ? secondsBreak : seconds}
+        minutes={isBreak ? FormatTime(minutesBreak) : FormatTime(minutes)}
+        seconds={isBreak ? FormatTime(secondsBreak) : FormatTime(seconds)}
       />
       <div className="flex flex-row gap-3 my-5 text-2xl">
         <Pause handlePause={handlePlay} />
