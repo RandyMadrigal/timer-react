@@ -112,7 +112,8 @@ export const TimerContainer = () => {
             setTitle("Session");
             pauseAudio();
             setIsBreak(false);
-            update(sessionLength);
+            update(sessionLength-1);
+            reset(59);
             clearInterval(myInterval);
           }
 
@@ -131,20 +132,22 @@ export const TimerContainer = () => {
             setTitle("Break time!");
             playAudio();
             setIsBreak(true);
-            updateBreak(breakLength);
+            updateBreak(breakLength-1);
+            
+            resetBreak(59);
             clearInterval(myInterval);
           }
 
           if (minutes === 0 || seconds >= 0) {
             if (seconds === 0) {
               reset(59);
-              minutes >= 0 && minuteDecrease();
+              minutes >= 0  && minuteDecrease();
             } else {
               secondDecrease();
             }
           }
         }
-      }, 1000);
+      }, 150);
       return () => clearInterval(myInterval);
     }
   }, [isPlay, seconds, isBreak, secondsBreak]);
