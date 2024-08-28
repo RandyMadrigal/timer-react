@@ -6,6 +6,7 @@ import { Reset } from "./Reset";
 import { useEffect, useState } from "react";
 import { PadBreak } from "./PadBreak";
 import { PadSession } from "./PadSession";
+import { Audio } from "./Audio";
 
 /*hooks*/
 import { MinutesHook } from "../hooks/session/MinutesHook";
@@ -14,6 +15,7 @@ import { PlayHook } from "../hooks/PlayHook";
 import { ResetHook } from "../hooks/ResetHook";
 import { MinutesBreakHook } from "../hooks/break/MinutesBreakHook";
 import { SecondsBreakHook } from "../hooks/break/SecondsBreakHook";
+import { AudioHook } from "../hooks/audio/AudioHook";
 
 /*Helper*/
 import { FormatTime } from "../helpers/FormatTime";
@@ -38,6 +40,9 @@ export const TimerContainer = () => {
   const { secondsBreak, secondDecreaseBreak, resetBreak, secondInitBreak } =
     SecondsBreakHook(0);
 
+  //Audio
+  const { audioRef, playAudio, pauseAudio } = AudioHook();
+
   const handleReset = () => {
     playing(false); // Stop the timer
     restart(true);
@@ -50,9 +55,9 @@ export const TimerContainer = () => {
     setIsBreak(false);
     setTitle("Session");
     setDisabled(false);
+    pauseAudio();
   };
 
-  
   const handlePlay = () => {
     playing(!isPlay);
     setDisabled(!isPlay);
@@ -98,19 +103,17 @@ export const TimerContainer = () => {
     }
   }, [isReset]);
 
-
   // Handle play/pause
   useEffect(() => {
     if (isPlay) {
       const myInterval = setInterval(() => {
-        
         if (isBreak) {
           if (minutesBreak === 0 && secondsBreak === 0) {
             setTitle("Session");
+            pauseAudio();
             setIsBreak(false);
             update(sessionLength);
-            clearInterval(myInterval)
-            console.log(`break end ${minutesBreak} : ${secondsBreak}`)
+            clearInterval(myInterval);
           }
 
           if (minutesBreak === 0 || secondsBreak >= 0) {
@@ -123,27 +126,25 @@ export const TimerContainer = () => {
           }
         }
 
-        if(!isBreak){
+        if (!isBreak) {
           if (minutes === 0 && seconds === 0) {
-            setIsBreak(true);
             setTitle("Break time!");
+            playAudio();
+            setIsBreak(true);
             updateBreak(breakLength);
-            clearInterval(myInterval)
-            console.log(`session end ${minutes} : ${seconds}`)
+            clearInterval(myInterval);
           }
 
           if (minutes === 0 || seconds >= 0) {
             if (seconds === 0) {
               reset(59);
-            minutes >= 0 && minuteDecrease();
+              minutes >= 0 && minuteDecrease();
             } else {
               secondDecrease();
             }
           }
         }
-
-      }, 150);
-
+      }, 200);
       return () => clearInterval(myInterval);
     }
   }, [isPlay, seconds, isBreak, secondsBreak]);
@@ -175,6 +176,7 @@ export const TimerContainer = () => {
         <Play handlePlay={handlePlay} />
         <Reset handleReset={handleReset} />
       </div>
+      <Audio ref={audioRef} />
     </div>
   );
 };
