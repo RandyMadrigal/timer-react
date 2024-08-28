@@ -147,7 +147,7 @@ export const TimerContainer = () => {
             }
           }
         }
-      }, 150);
+      }, 1000);
       return () => clearInterval(myInterval);
     }
   }, [isPlay, seconds, isBreak, secondsBreak]);
